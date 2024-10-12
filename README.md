@@ -28,7 +28,7 @@ Our group has chosen to work with a Kaggle-sourced dataset that examines job pos
 | job_summary  | job_link, job_summary                                 |
 
 ## Database Structuring
-The proposed normalized tables for structuring the data within the MySQL database can be seen in Figure 1 below.
+The proposed normalized tables for structuring the data within the MySQL database can be seen in Figure 1 below. The image also lives [here](https://github.com/jhnboyy/DATA607_Project3_FALL2024/blob/main/additional_materials/Figure1.png) with the acutal file [here](https://github.com/jhnboyy/DATA607_Project3_FALL2024/blob/main/additional_materials/EER.mwb)
 
 #### Figure 1: Proposed Database Table Structures
 ![Figure1](additional_materials/Figure1.png)
