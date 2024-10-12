@@ -33,4 +33,4 @@ The proposed normalized tables for structuring the data within the MySQL databas
 #### Figure 1: Proposed Database Table Structures
 ![Figure1](additional_materials/Figure1.png)
 ## Data Loading
-Currently, the data loading process can be seen in the following SQL file on GitHub within our shared public repo for this project.
+Currently, the data loading process can be seen in the following [file](https://github.com/jhnboyy/DATA607_Project3_FALL2024/blob/main/loading/job_post.sql) on GitHub within our shared public repo for this project.
