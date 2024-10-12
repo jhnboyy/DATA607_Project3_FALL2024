@@ -13,7 +13,7 @@ As a group, our main communication tools are iMessage and Slack. There may be ot
 Other than collaborating on Slack, other tools to be leveraged for code sharing and project documentation are GitHub.
 
 ### Database Tools
-For this project, our data will live in a local MySQL database. The languages used to analyze this data will be R and SQL.
+For this project, our data will live in a MySQL database hosted on CloudSQL. The languages used to analyze this data will be R and SQL.
 
 ## The Data
 
