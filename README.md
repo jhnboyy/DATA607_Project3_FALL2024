@@ -18,7 +18,7 @@ For this project, our data will live in a local MySQL database. The languages us
 ## The Data
 
 ### Data Source
-Our group has chosen to work with a Kaggle-sourced dataset that examines job postings on LinkedIn. This data contains information such as the locations of the entities hiring, the companies performing the hiring, the job titles for the open positions, along with additional information related to the position. Additional information, and the data set itself can be found here. Lastly, the dataset files and their respective column names can be found in Table 1 below.
+Our group has chosen to work with a Kaggle-sourced dataset that examines job postings on LinkedIn. This data contains information such as the locations of the entities hiring, the companies performing the hiring, the job titles for the open positions, along with additional information related to the position. Additional information, and the data set itself can be found [here](https://www.kaggle.com/datasets/asaniczka/data-science-job-postings-and-skills?select=job_skills.csv). Lastly, the dataset files and their respective column names can be found in Table 1 below.
 
 #### Table 1: Dataset Files and Columns
 | File Name   | Columns                                                |
