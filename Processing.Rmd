@@ -1,0 +1,189 @@
+---
+title: "Data607_Project3_Analysis"
+author: " John Ferrara, Alinzon Simon, Akeem Lawrence, Anthony Roman, and Ben Wolin"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(RMySQL)
+library(readr)
+library(tidyr)
+library(dplyr)
+```
+
+
+
+## Connecting to the Local Sql DB That was created via the Loading Script (./loading/job_post.sql)
+
+```{r sqlConnection}
+
+# Read the password in from file
+# ---- This will need to be changed for others if we dont use cloud infrastructure. 
+pw_path <- "~/Documents/secrets/mysql_root_pw.txt"
+password <- read_file(path.expand(pw_path))
+
+con <- dbConnect(RMySQL::MySQL(),
+                 dbname = "job_portal",
+                 host = "127.0.0.1",
+                 port = 3306,
+                 user = "root",
+                 password = password,
+                client.flag = CLIENT_LOCAL_FILES)
+
+```
+
+## Loading the Data (./data) into working memory here for processing.
+
+You can also embed plots, for example:
+
+```{r data_loading}
+
+#Reading in job_postings (./data/raw/job_postings.csv)
+job_postings_path <- "./data/raw/job_postings.csv"
+job_postings <- read.csv(job_postings_path)
+
+#Checking it looks ok 
+print(head(job_postings))
+print(colnames(job_postings))
+ # [1] "job_link"            "last_processed_time" "last_status"         "got_summary"         "got_ner"            
+ # [6] "is_being_worked"     "job_title"           "company"             "job_location"        "first_seen"         
+# [11] "search_city"         "search_country"      "search_position"     "job_level"           "job_type" 
+
+#Reading in job_skills (./data/raw/job_skills.csv)
+job_skills_path <- "./data/raw/job_skills.csv"
+job_skills <- read.csv(job_skills_path)
+#Checking it looks ok 
+print(head(job_skills))
+print(colnames(job_skills))
+# [1] "job_link"   "job_skills"
+
+#Reading in job_summary (./data/raw/job_summary.csv)
+job_summary_path <- "./data/raw/job_summary.csv"
+job_summary <- read.csv(job_summary_path)
+#Checking it looks ok
+print(head(job_summary))
+print(colnames(job_summary))
+# [1] "job_link"    "job_summary"
+
+```
+## Parsing and Processing Job Posting Data into tables to match Entity-Entity Relationship DIagram (./additonal_materials/EER.mwb) 
+
+### Working with Job Postings
+```{r job_postings}
+
+
+# Looking at the job status data in the job_postings data 
+print(unique(job_postings$last_status))
+## not ideal there is only one value in status; Making table anyway
+
+## Creating Status Table Df 
+status_values <- unique(job_postings$last_status)
+id_vector <-seq(from = 1, to = length(status_values), by =1) 
+status_table_df <- data.frame("status_id" = id_vector,
+                              "status_name"=status_values)
+status_table_df
+write.csv(status_table_df, "data/processed/status_table.csv")
+
+## not ideal there is only one value in status; 
+
+### Haveing Issues loading to local MySQL, also not sure wht platform we are using in cloud so just putting data in csvs atm.
+# dbWriteTable(con, name = "status", value = status_table_df, append = TRUE, row.names = FALSE)
+
+
+## Creating Location Table Df
+### NOTE: there is no state column, and nothing to parse out of the city column as the Kaggle Source page suggests.
+print(unique(job_postings$search_city))    
+print(unique(job_postings$search_country)
+
+location_df <- job_postings %>%
+    select(search_city, search_country)
+location_df <- distinct(location_df)
+#Adding Null State COlumn to match SQL table 
+location_df[ , 'state'] = NA
+location_df <- location_df %>% 
+  rename(country = search_country,city = search_city)
+#Adding id vector for final df 
+location_df$location_id <- seq(from = 1, to = nrow(location_df), by =1) 
+location_table_df<- location_df[,c("location_id","city","state","country")]
+write.csv(location_table_df, "data/processed/location_table.csv")
+
+##Creating Company Table DF 
+# print(unique(job_postings$company))
+company_values <- unique(job_postings$company)
+id_vector <-seq(from = 1, to = length(company_values), by =1) 
+company_table_df <- data.frame("company_id" = id_vector,
+                               "company_name"=company_values)
+write.csv(company_table_df, "data/processed/company_table.csv")
+
+## Job Post Id interim df
+link_values <- unique(job_postings$job_link)
+id_vector <-seq(from = 1, to = length(link_values), by =1) 
+link_id_table_df <- data.frame("job_post_id" = id_vector,
+                               "job_post_link"=link_values)
+
+
+### Adding Job Summary to the job posting df
+job_postings_w_summary <- job_postings %>% left_join(job_summary, by=c('job_link'))
+## Adding COmpany ID
+temp_comp <-company_table_df %>% rename(company=company_name)
+job_postings_w_summary <- job_postings_w_summary %>% left_join(temp_comp, by=c('company'))
+## Adding Status id
+status_comp <- status_table_df %>% rename(last_status=status_name)
+job_postings_w_status <- job_postings_w_summary %>% left_join(status_comp, by=c('last_status'))
+## adding location id
+loc_temp <- location_df[,c("location_id","city","country")]
+loc_temp <- loc_temp%>%rename(search_city=city,search_country=country)
+job_postings_w_loc <- job_postings_w_status %>% left_join(loc_temp, by=c('search_city','search_country'))
+### Adding Job post id (table used made down below made first)
+job_post_id_temp <- skill_df_link_flat_id[,c("job_post_id","job_post_link")]
+job_post_id_temp<- job_post_id_temp%>%rename(job_link = job_post_link)
+job_posting_w_all <- job_postings_w_loc %>% left_join(job_post_id_temp, by=c('job_link'))
+
+## Limiting and renaming to make the job_post table
+job_posting_table_df <- job_posting_w_all[,c("job_post_id","company_id","status_id","location_id","job_title","job_summary","last_processed_time")]
+write.csv(job_posting_table_df, "data/processed/job_posting_table.csv")
+
+
+```
+
+### Working with Job Skill File
+``` {r job_skills}
+### This df will be needed to add ids to the job post skill table via links
+skill_df_link_flat <- data.frame(job_link = character(), skill = character(), stringsAsFactors = FALSE)
+for (i in 1:nrow(job_skills)) {
+  # print(i)
+  ink_val <- job_skills[i, "job_link"]
+  skills_vec <-strsplit(job_skills[i, "job_skills"],",")[[1]]
+  for (skill in skills_vec) {
+    # strtrim(skill)
+    skill_df_link_flat <- rbind(skill_df_link_flat, data.frame(job_link = link_val, skill = trimws(skill), stringsAsFactors = FALSE))
+  }
+}
+
+#Creating SKill Table 
+skill_values <- unique(skill_df_link_flat$skill)
+id_vector <-seq(from = 1, to = length(skill_values), by =1) 
+skill_table_df <- data.frame("skill_id" = id_vector,
+                               "skill_name"=skill_values)
+write.csv(skill_table_df, "data/processed/skill_table.csv")
+
+
+## Left join skill id to the skill_df_link_flat
+skill_df_link_flat<- skill_df_link_flat %>% rename(skill_name = skill,job_post_link=job_link)
+skill_df_link_flat_id <- skill_df_link_flat %>% left_join(skill_table_df, by=c('skill_name'))
+## Joining in the job post id
+skill_df_link_flat_id <- skill_df_link_flat_id %>% left_join(link_id_table_df, by=c('job_post_link'))
+
+### Creating job_post_skill table df
+job_post_skill_temp <-distinct(skill_df_link_flat_id[,c("job_post_id","skill_id")])
+id_vector <-seq(from = 1, to = nrow(job_post_skill_temp), by =1) 
+job_post_skill_df <- data.frame("id" = id_vector,
+                                "job_post_id"=job_post_skill_temp$job_post_id,
+                               "skill_id"=job_post_skill_temp$skill_id)
+write.csv(job_post_skill_df, "data/processed/job_post_skill.csv")
+
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

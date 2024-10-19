@@ -7,7 +7,7 @@ output:
 This is the shared git repo for our Project 3 Team. 
 
 ## Group Members
-Group members include John Ferrara, Alinzon Simon, Akeem Lawrence, and Anthony Roman. Members are listed in no particular order.
+Group members include John Ferrara, Alinzon Simon, Akeem Lawrence, Anthony Roman, and Ben Wolin. Members are listed in no particular order.
 
 ## Collaboration Tools
 
