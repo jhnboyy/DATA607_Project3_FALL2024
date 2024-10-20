@@ -18,6 +18,7 @@ require(kableExtra)
 require(wordcloud)
 require(tm)
 require(ggwordcloud)
+require(tidytext)
 ```
 
 ```{r include = FALSE}
@@ -33,6 +34,7 @@ library(kableExtra)
 library(wordcloud)
 library(tm)
 library(ggwordcloud)
+library(tidytext)
 ```
 
 ## Introduction
@@ -70,6 +72,7 @@ The following packages are used for this project:
 -   `wordcloud`: For creating word clouds.
 -   `tm`: For text mining.
 -   `ggwordcloud`: For creating word clouds.
+-   `tidytext`: For text mining.
 
 ## Data Collection
 
@@ -77,15 +80,15 @@ The dataset used in this project was obtained from Kaggle and contains job posti
 
 The raw data contains information such as the locations of the entities hiring, the companies performing the hiring, the job titles for the open positions, along with additional information related to the position. Additional information, and the dataset itself can be found here. Lastly, the dataset files and their respective column names can be found in Table 1 below.
 
-::: {.table-caption}
+::: table-caption
 **Table 1**: Dataset Files and Columns
 :::
 
-| **File Name**  | **Columns** |
-|----------------|-------------|
-| job_postings   | job_link, last_processed_time, last_status, got_summary, got_ner, is_being_worked, job_title, company, job_location, first_seen, search_city, search_country, search_position, job_level, job_type |
-| job_skills     | job_link, job_skills |
-| job_summary    | job_link, job_summary |
+| **File Name** | **Columns** |
+|---------------------------------------|---------------------------------|
+| job_postings | job_link, last_processed_time, last_status, got_summary, got_ner, is_being_worked, job_title, company, job_location, first_seen, search_city, search_country, search_position, job_level, job_type |
+| job_skills | job_link, job_skills |
+| job_summary | job_link, job_summary |
 
 The raw data was then processed to this [directory](https://github.com/jhnboyy/DATA607_Project3_FALL2024/tree/main/data/processed) which will be utilized for analysis. The processed directory contains `company_table.csv`, `job_post_skill.csv`, `location_table.csv`, `skill_table.csv`, and `summary_table.csv`.
 
@@ -102,3 +105,91 @@ The data was structured into five tables for analysis:
 The image representation of the data is shown here:
 
 ![Proposed Database Table Structures](https://raw.githubusercontent.com/spacerome/DATA607_Project3_FALL2024/main/additional_materials/Figure1.png)
+
+## Data Cleaning
+
+The data was cleaned to remove missing values and standardize the format of the data. The following steps were taken to clean the data:
+
+1.  **Remove Missing Values**: Rows with missing values were removed from the dataset.
+2.  **Standardize Format**: The format of the data was standardized to ensure consistency across the dataset.
+3.  **Remove Duplicates**: Duplicate rows were removed from the dataset.
+4.  **Remove Special Characters**: Special characters were removed from the data to ensure accurate analysis.
+
+The cleaned data was then used for further analysis to determine the key skills in demand in the data science field.
+
+```{r read_data}
+# Load the raw data
+jobpostings <- getURL("https://raw.githubusercontent.com/jhnboyy/DATA607_Project3_FALL2024/refs/heads/main/data/raw/job_postings.csv")
+jobskills <- getURL("https://raw.githubusercontent.com/jhnboyy/DATA607_Project3_FALL2024/refs/heads/main/data/raw/job_skills.csv")
+jobsummary <- getURL("https://raw.githubusercontent.com/jhnboyy/DATA607_Project3_FALL2024/refs/heads/main/data/raw/job_summary.csv")
+
+# Read the data into dataframes
+jpdf <- data.frame(read.csv(text=jobpostings, sep= "," , stringsAsFactors = FALSE, check.names = FALSE))
+jskdf <- data.frame(read.csv(text=jobskills, sep= "," , stringsAsFactors = FALSE, check.names = FALSE))
+jssdf <- data.frame(read.csv(text=jobsummary, sep= "," , stringsAsFactors = FALSE, check.names = FALSE))
+
+```
+
+This will check the dataframes to see if there are any missing values in the dataset.
+
+```{r checkdf}
+# Check for missing values in the entire dataset
+sum(is.na(jpdf))  # For job postings data
+sum(is.na(jskdf)) # For job skills data
+sum(is.na(jssdf)) # For job summary data
+
+# Identify which columns have missing values
+colSums(is.na(jpdf))
+colSums(is.na(jskdf))
+colSums(is.na(jssdf))
+
+# Check the column names in each dataframe
+colnames(jpdf)
+colnames(jssdf)
+colnames(jskdf)
+```
+
+After verifying if there were any missing values in the dataframes, the next step is to remove any missing values from the dataframes, but fortunately there were not any missing values in the dataframes. The next step is to combine the dataframes into one dataframe which will be labeled `combined_data`. The combined dataframe will also have a column named `job_id` which will be a unique identifier for each job posting.
+
+```{r combine_data}
+# Combine the dataframes using 'job_link' as the common key
+combined_data <- jpdf %>%
+  left_join(jssdf, by = "job_link") %>%
+  left_join(jskdf, by = "job_link")
+
+# Assign a unique job_id for each row in the combined data
+combined_data <- combined_data %>%
+  mutate(job_id = row_number())
+
+# Check the updated dataframe with job_id
+# head(combined_data)
+```
+
+```{r df_modify}
+# Reorder the columns so that job_id is the first column
+combined_data <- combined_data %>%
+  select(job_id, everything())
+
+# Check the result
+# head(combined_data)
+```
+
+```{r include = FALSE}
+# Export the combined_data dataframe to a CSV file
+#write.csv(combined_data, "processed_data.csv", row.names = FALSE)
+```
+
+## Processed Data
+
+```{r processeddata}
+skillid <- getURL("https://raw.githubusercontent.com/jhnboyy/DATA607_Project3_FALL2024/refs/heads/main/data/processed/skill_table.csv")
+skillsdf <- data.frame(read.csv(text=skillid, sep= "," , stringsAsFactors = FALSE, check.names = FALSE))
+jobpostskill <- getURL("https://raw.githubusercontent.com/jhnboyy/DATA607_Project3_FALL2024/refs/heads/main/data/processed/job_post_skill.csv")
+jobpostskilldf <- data.frame(read.csv(text=jobpostskill, sep= "," , stringsAsFactors = FALSE, check.names = FALSE))
+company <- getURL("https://raw.githubusercontent.com/jhnboyy/DATA607_Project3_FALL2024/refs/heads/main/data/processed/company_table.csv")
+companydf <- data.frame(read.csv(text=company, sep= "," , stringsAsFactors = FALSE, check.names = FALSE))
+location <- getURL("https://raw.githubusercontent.com/jhnboyy/DATA607_Project3_FALL2024/refs/heads/main/data/processed/location_table.csv")
+locationdf <- data.frame(read.csv(text=location, sep= "," , stringsAsFactors = FALSE, check.names = FALSE))
+status <- getURL("https://raw.githubusercontent.com/jhnboyy/DATA607_Project3_FALL2024/refs/heads/main/data/processed/summary_table.csv")
+statusdf <- data.frame(read.csv(text=status, sep= "," , stringsAsFactors = FALSE, check.names = FALSE))
+```
