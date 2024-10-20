@@ -1,0 +1,76 @@
+---
+title: "Data607: Project 3 - Data Science Skills"
+author: "Anthony Roman, John Ferrara, Alinzon Simon, Akeem Lawrence, Ben Wolin"
+format: html
+editor: visual
+---
+
+```{r include = FALSE}
+require(readr)
+require(RCurl)
+require(stringr)
+require(dplyr)
+require(tidyr)
+require(tidyverse)
+require(ggplot2)
+require(knitr)
+require(kableExtra)
+require(wordcloud)
+require(tm)
+require(ggwordcloud)
+```
+
+```{r include = FALSE}
+library(readr)
+library(RCurl)
+library(stringr)
+library(dplyr)
+library(tidyr)
+library(tidyverse)
+library(ggplot2)
+library(knitr)
+library(kableExtra)
+library(wordcloud)
+library(tm)
+library(ggwordcloud)
+```
+
+## Introduction
+
+The aim of this project is to find out what skills in data science are mostly demanded in the labor market that is now booming. Data science has become a highly important field in all sectors, where innovation and decisions are powered by insights drawn from available data. Increasingly, companies look up to data scientists to make sense of vast datasets, develop predictive models, and deliver actionable insights that would inform their business strategies.
+
+With the growth of the data science field, the required skills are also changing; they now range from knowing programming languages like Python and R to machine learning, advanced techniques in the visualization of data, cloud computing, and big data analytics. Understanding which skills are considered valuable helps aspiring data scientists and professionals currently working in the field orient their development efforts toward market needs.
+
+The project will analyze current job postings to determine the key skills in demand today and how professionals and organizations can remain competitive within this exponentially growing industry. By studying trends across different regions and sectors, we learn how specific skills are valued differently depending on the industry or location.
+
+The data used in this project was obtained from Kaggle, a platform for predictive modeling and analytics competitions. The dataset contains job postings for data science positions, including information on the job title, location, company, job description, and required skills. The dataset was collected from Indeed.com, a popular job search engine, and contains job postings from various countries and industries.
+
+The overall approach to the analysis is as follows:
+
+1.  **Data Collection**: The dataset was obtained from Kaggle and loaded into R for analysis.
+2.  **Data Cleaning**: The dataset was cleaned to remove missing values and standardize the format of the data.
+3.  **Word Tokenization**: The job descriptions were tokenized to extract the skills required for each job posting.
+4.  **Word Classification**: The skills were classified into categories such as programming languages, machine learning, and data visualization.
+5.  **Data Analysis**: The skills were analyzed to determine the most in-demand skills in the data science field.
+6.  **Visualization**: The results were visualized using bar charts and word clouds to highlight the key skills in demand.
+
+## Loading Packages
+
+The following packages are used for this project:
+
+-   `readr`: For reading in the dataset.
+-   `RCurl`: For reading in the dataset.
+-   `stringr`: For string manipulation.
+-   `dplyr`: For data manipulation.
+-   `tidyr`: For data manipulation.
+-   `tidyverse`: For data manipulation.
+-   `ggplot2`: For data visualization.
+-   `kableExtra`: For creating tables.
+-   `knitr`: For creating reports.
+-   `wordcloud`: For creating word clouds.
+-   `tm`: For text mining.
+-   `ggwordcloud`: For creating word clouds.
+
+## Data Collection
+
+The dataset used in this project was obtained from Kaggle and contains job postings for data science positions. The dataset was collected from Indeed.com and includes information on the job title, location, company, job description, and required skills. The following raw data is found [here](https://github.com/jhnboyy/DATA607_Project3_FALL2024/tree/main/data/raw). The raw data contains `job_postings.csv`, `job_skills.csv`, and `job_summary.csv`. The raw data was then processed to this [directory](https://github.com/jhnboyy/DATA607_Project3_FALL2024/tree/main/data/processed) which will be utilized for analysis. The processed directory contains `company_table.csv`, `job_post_skill.csv`, `location_table.csv`, `skill_table.csv`, and `summary_table.csv`.
