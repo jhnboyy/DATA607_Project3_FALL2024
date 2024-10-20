@@ -1,0 +1,92 @@
+---
+title: 'Data607 Project 3: Most Valued Data Science Skills'
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r include=FALSE}
+library(readr)
+library(RCurl)
+library(stringr)
+library(dplyr)
+library(tidyr)
+library(tidyverse)
+library(ggplot2)
+library(knitr)
+library(kableExtra)
+```
+
+## Group Members
+
+The group members include:
+
+- John Ferrara
+- Alinzon Simon
+- Akeem Lawrence
+- Anthony Roman
+- Ben Wolin
+
+## Introduction
+
+The aim of this project is to find out what skills in data science are mostly demanded in the labour market that is now booming. Data science has become a highly important field in all sectors, where innovation and decisions are powered by insights drawn from available data. Increasingly, companies look up to data scientists to make sense of vast datasets, develop predictive models, and deliver actionable insights that would inform their business strategies.
+
+With the growth of the data science field, the required skills are also changing; they now range from knowing programming languages like Python and R to machine learning, advanced techniques in the visualisation of data, cloud computing, and big data analytics. Understanding which skills are considered valuable helps aspiring data scientists and professionals currently working in the field orient their development efforts toward market needs.
+
+The project will analyze current job postings to determine the key skills in demand today and how professionals and organizations can remain competitive within this exponentially growing industry. By studying trends across different regions and sectors, we learn how specific skills are valued differently depending on the industry or location.
+
+## Collaboration Tools
+
+### Communication
+
+As a group, our main communication tools are iMessage and Slack. There may be other means of communication used, but so far these have been our main methods.
+
+### Code Sharing & Project Documentation
+
+Other than collaborating on Slack, other tools to be leveraged for code sharing and project documentation are [GitHub](https://github.com/jhnboyy/DATA607_Project3_FALL2024).
+
+### Database Tools
+
+For this project, our data will live in a MySQL database hosted on CloudSQL. The languages used to analyze this data will be R and SQL.
+
+## The Data
+
+### Data Source
+
+Our group has chosen to work with a Kaggle-sourced dataset that examines job postings on LinkedIn. This data contains information such as the locations of the entities hiring, the companies performing the hiring, the job titles for the open positions, along with additional information related to the position. Additional information, and the dataset itself can be found here. Lastly, the dataset files and their respective column names can be found in Table 1 below.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{|l|p{12cm}|}
+\hline
+\textbf{File Name} & \textbf{Columns} \\ \hline
+job\_postings & job\_link, last\_processed\_time, last\_status, got\_summary, got\_ner, is\_being\_worked, job\_title, company, job\_location, first\_seen, search\_city, search\_country, search\_position, job\_level, job\_type \\ \hline
+job\_skills & job\_link, job\_skills \\ \hline
+job\_summary & job\_link, job\_summary \\ \hline
+\end{tabular}
+\caption{Dataset Files and Columns}
+\end{table}
+
+
+### Sources
+
+The links to the data sources are from here:
+
+- [Kaggle Job Postings](https://www.kaggle.com/datasets/asaniczka/data-science-job-postings-and-skills)
+- [Kaggle Data Science Skills](https://www.kaggle.com/datasets/aravindanr22052001/skillscsv)
+- [Job Postings](https://github.com/Minh-Nguyen-0401/Glassdoor-Data-Preprocessing-And-EDA-Project)
+
+## Database Structuring
+
+The proposed normalized tables for structuring the data within the MySQL database can be seen in Figure
+1 below. The image also lives here with the acutal file [here](https://github.com/jhnboyy/DATA607_Project3_FALL2024/blob/main/additional_materials/EER.mwb)
+
+![Proposed Database Table Structures]("\DATA607_Project3_FALL2024\additional_materials\project3 initial submission rmd\ERDiagram.png")
+
+## Data Loading
+
+Currently, the data loading process can be seen from the following file on GitHub within our shared public repo for this project.
+
