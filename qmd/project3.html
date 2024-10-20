@@ -100,11 +100,61 @@ ul.task-list li input[type="checkbox"] {
 <li><code>knitr</code>: For creating reports.</li>
 <li><code>wordcloud</code>: For creating word clouds.</li>
 <li><code>tm</code>: For text mining.</li>
+<li><code>ggwordcloud</code>: For creating word clouds.</li>
 </ul>
 </section>
 <section id="data-collection" class="level2">
 <h2 class="anchored" data-anchor-id="data-collection">Data Collection</h2>
 <p>The dataset used in this project was obtained from Kaggle and contains job postings for data science positions. The dataset was collected from Indeed.com and includes information on the job title, location, company, job description, and required skills. The following raw data is found <a href="https://github.com/jhnboyy/DATA607_Project3_FALL2024/tree/main/data/raw">here</a>. The raw data contains <code>job_postings.csv</code>, <code>job_skills.csv</code>, and <code>job_summary.csv</code>.</p>
+<p>The raw data contains information such as the locations of the entities hiring, the companies performing the hiring, the job titles for the open positions, along with additional information related to the position. Additional information, and the dataset itself can be found here. Lastly, the dataset files and their respective column names can be found in Table 1 below.</p>
+<div class="table-caption">
+<p><strong>Table 1</strong>: Dataset Files and Columns</p>
+</div>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 55%">
+<col style="width: 44%">
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>File Name</strong></th>
+<th><strong>Columns</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>job_postings</td>
+<td>job_link, last_processed_time, last_status, got_summary, got_ner, is_being_worked, job_title, company, job_location, first_seen, search_city, search_country, search_position, job_level, job_type</td>
+</tr>
+<tr class="even">
+<td>job_skills</td>
+<td>job_link, job_skills</td>
+</tr>
+<tr class="odd">
+<td>job_summary</td>
+<td>job_link, job_summary</td>
+</tr>
+</tbody>
+</table>
+<p>The raw data was then processed to this <a href="https://github.com/jhnboyy/DATA607_Project3_FALL2024/tree/main/data/processed">directory</a> which will be utilized for analysis. The processed directory contains <code>company_table.csv</code>, <code>job_post_skill.csv</code>, <code>location_table.csv</code>, <code>skill_table.csv</code>, and <code>summary_table.csv</code>.</p>
+<section id="structuring-of-the-data" class="level3">
+<h3 class="anchored" data-anchor-id="structuring-of-the-data">Structuring of the Data</h3>
+<p>The data was structured into five tables for analysis:</p>
+<ol type="1">
+<li><code>company_table.csv</code>: Contains information on the companies hiring for data science positions.</li>
+<li><code>job_post_skill.csv</code>: Contains information on the job postings and the skills required for each job.</li>
+<li><code>location_table.csv</code>: Contains information on the locations of the job postings.</li>
+<li><code>skill_table.csv</code>: Contains information on the skills required for data science positions.</li>
+<li><code>summary_table.csv</code>: Contains information on the job summaries.</li>
+</ol>
+<p>The image representation of the data is shown here:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://raw.githubusercontent.com/spacerome/DATA607_Project3_FALL2024/main/additional_materials/Figure1.png" class="img-fluid figure-img"></p>
+<figcaption>Proposed Database Table Structures</figcaption>
+</figure>
+</div>
+</section>
 </section>
 
 </main>
