@@ -19,6 +19,8 @@ require(wordcloud)
 require(tm)
 require(ggwordcloud)
 require(tidytext)
+require(colorspace)
+require(RColorBrewer)
 ```
 
 ```{r include = FALSE}
@@ -35,6 +37,8 @@ library(wordcloud)
 library(tm)
 library(ggwordcloud)
 library(tidytext)
+library(colorspace)
+library(RColorBrewer)
 ```
 
 ## Introduction
@@ -73,6 +77,7 @@ The following packages are used for this project:
 -   `tm`: For text mining.
 -   `ggwordcloud`: For creating word clouds.
 -   `tidytext`: For text mining.
+-   `colorspace` : For color palettes.
 
 ## Data Collection
 
@@ -101,6 +106,13 @@ The data was structured into threee tables for analysis:
 The image representation of the data is shown here:
 
 ![Proposed Database Table Structures](https://raw.githubusercontent.com/spacerome/DATA607_Project3_FALL2024/main/additional_materials/Figure1.png)
+### Sources
+
+The links to the data sources are from here:
+
+- [Kaggle Job Postings](https://www.kaggle.com/datasets/asaniczka/data-science-job-postings-and-skills)
+- [Kaggle Data Science Skills](https://www.kaggle.com/datasets/aravindanr22052001/skillscsv)
+- [Job Postings](https://github.com/Minh-Nguyen-0401/Glassdoor-Data-Preprocessing-And-EDA-Project)
 
 ## Data Cleaning
 
@@ -157,8 +169,6 @@ combined_data <- jpdf %>%
 combined_data <- combined_data %>%
   mutate(job_id = row_number())
 
-# Check the updated dataframe with job_id
-# head(combined_data)
 ```
 
 ```{r df_modify}
@@ -166,13 +176,6 @@ combined_data <- combined_data %>%
 combined_data <- combined_data %>%
   select(job_id, everything())
 
-# Check the result
-# head(combined_data)
-```
-
-```{r include = FALSE}
-# Export the combined_data dataframe to a CSV file
-#write.csv(combined_data, "processed_data.csv", row.names = FALSE)
 ```
 
 We will now proceed to tokenize the job descriptions to extract the skills required for each job posting.
@@ -254,9 +257,6 @@ combined_data <- combined_data %>%
          machine_learning = str_extract(tolower(job_summary), paste(machine_learning, collapse = "|")),
          data_visualization = str_extract(tolower(job_summary), paste(data_visualization, collapse = "|")))
 
-# Check the updated dataframe with skill categories
-# head(combined_data)
-
 ```
 
 ## Data Analysis
@@ -279,9 +279,6 @@ skill_counts <- combined_data %>%
   summarise(count = n()) %>%
   arrange(desc(count))
 
-# Check the skill counts
-# head(skill_counts)
-
 ```
 
 ## Visualization
@@ -295,18 +292,26 @@ The visualizations provide insights into the key skills required for data scienc
 
 ```{r visualization}
 
-# Create a bar chart of the skills in demand by category
-skill_counts %>%
+top_skills <- skill_counts %>%
+  arrange(desc(count)) %>%
+  head(20)
+
+top_skills %>%
   ggplot(aes(x = reorder(skill, count), y = count, fill = skill_category)) +
   geom_bar(stat = "identity", position = "dodge") +
   coord_flip() +
-  labs(title = "Skills in Demand by Category",
+  labs(title = "Top 20 Skills in Demand by Category",
        x = "Skill",
        y = "Count",
        fill = "Skill Category") +
   theme_minimal() +
-  theme(legend.position = "bottom")
+  theme(legend.position = "bottom") +
+  scale_fill_brewer(palette = "Set3")
+```
 
+The top 20 skills will fall under three main categories, namely programming languages, machine learning, and data visualization. In this category of programming languages, the above-mentioned R, Python, and SQL are foreseen to occupy the topmost positions, which shall once again confirm their pivotal role in data manipulation, analysis, and database management. Next, in the area of machine learning, techniques such as Machine Learning, Artificial Intelligence, and Reinforcement Learning will be immensely important, thereby establishing predictive modeling and advanced analytics as more vital in nature. Having Tableau lead the way in visualization, it shows how important it is for data practitioners to take 'hard-to-view' data and show it in understandable visualizations. What can be taken away from this breakdown is that data science is a very interdisciplinary field where technical, analytical, and communication skills all interweave together.
+
+```{r visualization2}
 # Split job skills, count occurrences, and visualize
 skills_series <- combined_data %>%
   filter(!is.na(job_skills)) %>%
@@ -317,34 +322,57 @@ skills_series <- combined_data %>%
 skill_counts <- skills_series %>%
   count(job_skills, sort = TRUE)
 
+# Standardize similar skill names (e.g., combine "Data Analytics" and "Data Analysis")
+skills_series <- skills_series %>%
+  mutate(job_skills = case_when(
+    job_skills %in% c("Data Analytics", "Data analysis") ~ "Data Analysis",
+    TRUE ~ job_skills
+  ))
+
+# Recount the occurrences after standardization
+skill_counts <- skills_series %>%
+  count(job_skills, sort = TRUE)
+
 # Plot top skills
 top_skills <- head(skill_counts, 20)
 ggplot(top_skills, aes(x = reorder(job_skills, n), y = n)) +
   geom_bar(stat = "identity", fill = "steelblue") +
   coord_flip() +
   labs(title = "Top 20 Data Science Skills", x = "Skills", y = "Frequency")
+```
 
+This bar chart now gives a more structured breakdown of the top 20 most frequent data science skills. Python and SQL head the chart, reinforcing their integral part in any Data Scientist's toolkit. Data Analysis, Communication, and Machine Learning come next, underlining the dual importance of both analytical skills and the ability to clearly present findings to non-technical stakeholders. Tools like Tableau, AWS, and R fortify the necessity of data visualization and cloud computing. The combination of hard skills, including Spark and Data Engineering, and soft skills like Teamwork and Problem Solving, indicates that successful data scientists should bring various competencies to their roles.
 
-# Create a word cloud of the most in-demand skills
-word_freq_df %>%
-  filter(word %in% c(programming_languages, machine_learning, data_visualization)) %>%
-  ggplot(aes(label = word, size = freq, color = word)) +
-  geom_text_wordcloud() +
-  scale_size_area(max_size = 20) +
-  theme_minimal()
+```{r wordcloud}
+# Use the skill_counts dataframe, where 'job_skills' is the word and 'n' is the frequency
+# Use the top 50 skills to generate a word cloud
+top_skills <- skill_counts %>%
+  head(50)  # Use the top 50 skills for the word cloud
+
+# Generate a dynamic color palette with the same number of colors as unique skills
+color_count <- length(unique(top_skills$job_skills))
+color_palette <- rainbow_hcl(color_count)  # Generate dynamic colors
+
+# Create the word cloud using dynamic colors
+top_skills %>%
+  ggplot(aes(label = job_skills, size = n, color = job_skills)) +  # Assign color to each word
+  geom_text_wordcloud_area() +  # Use the word cloud function for better layout
+  scale_size_area(max_size = 25) +  # Adjust the max size of the words (play with this for the right scale)
+  scale_color_manual(values = color_palette) +  # Use the generated color palette
+  theme_minimal() +  # Use a minimal theme
+  labs(title = "Top In-Demand Skills") +  # Add a title
+  theme(plot.title = element_text(hjust = 0.5))  # Center the title
 
 ```
 
+Below is the word cloud of the most in-demand skills in data science, where the size of each word shows how often a particular skill occurs in job postings. Python, SQL, and Data Analysis will be the three most outstanding skills, therefore meaning these are the most in-demand skills in the field. Other relevant technical skills are Java, AWS, Tableau, and Machine Learning, showing interest in being proficient with programming languages, cloud computing platforms, and data visualization tools. Also, some soft skills are represented, like Communication, Leadership, and Teamwork, which means that a data science professional is not only required to deliver on technical tasks but also on collaboration and effective communication of insights.
+
 ## Conclusion
 
-The analysis of job postings for data science positions revealed the key skills in demand in the data science field. The most in-demand skills were found to be programming languages, machine learning, and data visualization. Programming languages such as Python, R, and Java were highly valued, along with machine learning skills such as deep learning, neural networks, and artificial intelligence. Data visualization skills were also considered essential, with data visualization, data analysis, and data exploration being among the most in-demand skills.
+The trend of job postings within data science also points to the prescription of crucial skills necessary for success. The most wanted skills seem to fall under three categories: programming languages, machine learning, and data visualization. Above all, the most sought-after are programming languages in Python, R, and Java, and the machine learning techniques include deep learning, neural networks, and artificial intelligence. Additionally, visualization of data, data analysis, and data exploration are critical for conveying insights effectively.
 
-The results of the analysis provide valuable insights for professionals and organizations looking to stay competitive in the data science field. By focusing on developing skills in programming languages, machine learning, and data visualization, professionals can enhance their career prospects and contribute to the success of their organizations. Organizations can also use the insights to recruit talent with the right skills and capabilities to drive innovation and growth.
+These insights are helpful to professionals and organizations wishing to become or remain competitive. This may be particularly true for professionals, since the development of skills like programming, machine learning, and data visualization will certainly pay off with excellent career prospects, improving their contribution to data-driven decision-making. Equally, organizations can power up innovation, assure growth, and strategic outcomes by attracting the best talent with these competencies.
 
-The exponential growth of the data science field presents numerous opportunities for professionals and organizations to leverage data-driven insights for decision-making and strategic planning. By understanding the key skills in demand and staying abreast of industry trends, professionals and organizations can position themselves for success in the dynamic and evolving data science landscape.
+As the field of data science continues to expand, the demand for informed insights from data that drive decision-making and strategic planning will increase exponentially. With a guarantee of a successful future, professionals update their knowledge on current industry trends and develop competencies in-demand by organizations. Correspondingly, organizations which emphasize the same competencies will be at the helm as they successfully navigate the fast-changing landscape presented by data science.
 
-The project provides a comprehensive analysis of the skills required for data science positions and offers valuable insights for professionals and organizations seeking to excel in the data science field. By focusing on developing the most in-demand skills and staying informed about industry trends, professionals and organizations can navigate the rapidly changing data science landscape and achieve their goals in this exciting and rewarding field.
-
-
-
-
+The following project maps out an all-round view of major skills expected in a data science position, along with actionable insights for professionals and companies. Focusing on the most valued skills and keeping up with industry changes, individual professionals and organizations can better prepare for challenges and opportunities within the high-growth field of data science.
