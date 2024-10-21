@@ -171,16 +171,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
-<p>The raw data was then processed to this <a href="https://github.com/jhnboyy/DATA607_Project3_FALL2024/tree/main/data/processed">directory</a> which will be utilized for analysis. The processed directory contains <code>company_table.csv</code>, <code>job_post_skill.csv</code>, <code>location_table.csv</code>, <code>skill_table.csv</code>, and <code>summary_table.csv</code>.</p>
 <section id="structuring-of-the-data" class="level3">
 <h3 class="anchored" data-anchor-id="structuring-of-the-data">Structuring of the Data</h3>
-<p>The data was structured into five tables for analysis:</p>
+<p>The data was structured into threee tables for analysis:</p>
 <ol type="1">
-<li><code>company_table.csv</code>: Contains information on the companies hiring for data science positions.</li>
-<li><code>job_post_skill.csv</code>: Contains information on the job postings and the skills required for each job.</li>
-<li><code>location_table.csv</code>: Contains information on the locations of the job postings.</li>
-<li><code>skill_table.csv</code>: Contains information on the skills required for data science positions.</li>
-<li><code>summary_table.csv</code>: Contains information on the job summaries.</li>
+<li><code>job_postings</code>: Contains information about the job postings, including the job title, company, location, and job description.</li>
+<li><code>job_skills</code>: Contains information about the skills required for each job posting.</li>
+<li><code>job_summary</code>: Contains a summary of the job description for each job posting.</li>
 </ol>
 <p>The image representation of the data is shown here:</p>
 <div class="quarto-figure quarto-figure-center">
@@ -289,18 +286,220 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Check the result</span></span>
 <span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="co"># head(combined_data)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>We will now proceed to tokenize the job descriptions to extract the skills required for each job posting.</p>
+</section>
+<section id="word-tokenization" class="level2">
+<h2 class="anchored" data-anchor-id="word-tokenization">Word Tokenization</h2>
+<p>The job descriptions were tokenized to extract the skills required for each job posting. The following steps were taken to tokenize the job descriptions:</p>
+<ol type="1">
+<li><strong>Tokenization</strong>: The job descriptions were tokenized to extract individual words.</li>
+<li><strong>Remove Stopwords</strong>: Common words such as “and,” “the,” and “is” were removed from the tokenized words.</li>
+<li><strong>Remove Punctuation</strong>: Punctuation marks were removed from the tokenized words.</li>
+<li><strong>Convert to Lowercase</strong>: The tokenized words were converted to lowercase for consistency.</li>
+</ol>
+<p>The tokenized words were then used to extract the skills required for each job posting.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>skillid <span class="ot">&lt;-</span> <span class="fu">getURL</span>(<span class="st">"https://raw.githubusercontent.com/jhnboyy/DATA607_Project3_FALL2024/refs/heads/main/data/processed/skill_table.csv"</span>)</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>skillsdf <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">read.csv</span>(<span class="at">text=</span>skillid, <span class="at">sep=</span> <span class="st">","</span> , <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>, <span class="at">check.names =</span> <span class="cn">FALSE</span>))</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>jobpostskill <span class="ot">&lt;-</span> <span class="fu">getURL</span>(<span class="st">"https://raw.githubusercontent.com/jhnboyy/DATA607_Project3_FALL2024/refs/heads/main/data/processed/job_post_skill.csv"</span>)</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>jobpostskilldf <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">read.csv</span>(<span class="at">text=</span>jobpostskill, <span class="at">sep=</span> <span class="st">","</span> , <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>, <span class="at">check.names =</span> <span class="cn">FALSE</span>))</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>company <span class="ot">&lt;-</span> <span class="fu">getURL</span>(<span class="st">"https://raw.githubusercontent.com/jhnboyy/DATA607_Project3_FALL2024/refs/heads/main/data/processed/company_table.csv"</span>)</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>companydf <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">read.csv</span>(<span class="at">text=</span>company, <span class="at">sep=</span> <span class="st">","</span> , <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>, <span class="at">check.names =</span> <span class="cn">FALSE</span>))</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>location <span class="ot">&lt;-</span> <span class="fu">getURL</span>(<span class="st">"https://raw.githubusercontent.com/jhnboyy/DATA607_Project3_FALL2024/refs/heads/main/data/processed/location_table.csv"</span>)</span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>locationdf <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">read.csv</span>(<span class="at">text=</span>location, <span class="at">sep=</span> <span class="st">","</span> , <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>, <span class="at">check.names =</span> <span class="cn">FALSE</span>))</span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>status <span class="ot">&lt;-</span> <span class="fu">getURL</span>(<span class="st">"https://raw.githubusercontent.com/jhnboyy/DATA607_Project3_FALL2024/refs/heads/main/data/processed/summary_table.csv"</span>)</span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>statusdf <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">read.csv</span>(<span class="at">text=</span>status, <span class="at">sep=</span> <span class="st">","</span> , <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>, <span class="at">check.names =</span> <span class="cn">FALSE</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tokenize the job descriptions</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a corpus from the job descriptions</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>corpus <span class="ot">&lt;-</span> <span class="fu">Corpus</span>(<span class="fu">VectorSource</span>(combined_data<span class="sc">$</span>job_summary))</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert the corpus to lowercase</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>corpus <span class="ot">&lt;-</span> <span class="fu">tm_map</span>(corpus, <span class="fu">content_transformer</span>(tolower))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in tm_map.SimpleCorpus(corpus, content_transformer(tolower)):
+transformation drops documents</code></pre>
 </div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove punctuation</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>corpus <span class="ot">&lt;-</span> <span class="fu">tm_map</span>(corpus, removePunctuation)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in tm_map.SimpleCorpus(corpus, removePunctuation): transformation drops
+documents</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove numbers</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>corpus <span class="ot">&lt;-</span> <span class="fu">tm_map</span>(corpus, removeNumbers)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in tm_map.SimpleCorpus(corpus, removeNumbers): transformation drops
+documents</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove stopwords</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>corpus <span class="ot">&lt;-</span> <span class="fu">tm_map</span>(corpus, removeWords, <span class="fu">stopwords</span>(<span class="st">"en"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in tm_map.SimpleCorpus(corpus, removeWords, stopwords("en")):
+transformation drops documents</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a document term matrix</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>dtm <span class="ot">&lt;-</span> <span class="fu">DocumentTermMatrix</span>(corpus)</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert the document term matrix to a matrix</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(dtm)</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the word frequency</span></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>word_freq <span class="ot">&lt;-</span> <span class="fu">colSums</span>(m)</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert the word frequency to a data frame</span></span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>word_freq_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">word =</span> <span class="fu">names</span>(word_freq), <span class="at">freq =</span> word_freq)</span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Order the data frame by frequency</span></span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>word_freq_df <span class="ot">&lt;-</span> word_freq_df[<span class="fu">order</span>(<span class="sc">-</span>word_freq_df<span class="sc">$</span>freq), ]</span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Check the top 10 words by frequency</span></span>
+<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(word_freq_df, <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                 word   freq
+data             data 122816
+experience experience  65779
+will             will  36024
+work             work  35060
+team             team  29087
+business     business  28372
+show             show  24670
+skills         skills  22715
+years           years  21511
+management management  20956</code></pre>
+</div>
+</div>
+</section>
+<section id="word-classification" class="level2">
+<h2 class="anchored" data-anchor-id="word-classification">Word Classification</h2>
+<p>The skills extracted from the job descriptions were classified into categories such as programming languages, machine learning, and data visualization. The following steps were taken to classify the skills:</p>
+<ol type="1">
+<li><strong>Create Skill Categories</strong>: Categories such as programming languages, machine learning, and data visualization were created to classify the skills.</li>
+<li><strong>Match Skills to Categories</strong>: The skills extracted from the job descriptions were matched to the corresponding categories.</li>
+<li><strong>Count Skills by Category</strong>: The skills were counted by category to determine the most in-demand skills in each category.</li>
+</ol>
+<p>The skills were then analyzed to determine the most in-demand skills in the data science field.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a list of programming languages</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>programming_languages <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"python"</span>, <span class="st">"r"</span>, <span class="st">"java"</span>, <span class="st">"c++"</span>, <span class="st">"c#"</span>, <span class="st">"javascript"</span>, <span class="st">"sql"</span>, <span class="st">"scala"</span>, <span class="st">"ruby"</span>, <span class="st">"perl"</span>, <span class="st">"php"</span>, <span class="st">"swift"</span>, <span class="st">"kotlin"</span>, <span class="st">"typescript"</span>, <span class="st">"go"</span>, <span class="st">"rust"</span>, <span class="st">"dart"</span>)</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a list of machine learning skills</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>machine_learning <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"machine learning"</span>, <span class="st">"deep learning"</span>, <span class="st">"neural networks"</span>, <span class="st">"artificial intelligence"</span>, <span class="st">"natural language processing"</span>, <span class="st">"reinforcement learning"</span>, <span class="st">"supervised learning"</span>, <span class="st">"unsupervised learning"</span>, <span class="st">"semi-supervised learning"</span>, <span class="st">"ensemble learning"</span>, <span class="st">"transfer learning"</span>, <span class="st">"deep reinforcement learning"</span>, <span class="st">"deep neural networks"</span>, <span class="st">"convolutional neural networks"</span>, <span class="st">"recurrent neural networks"</span>, <span class="st">"generative adversarial networks"</span>, <span class="st">"support vector machines"</span>, <span class="st">"random forests"</span>, <span class="st">"decision trees"</span>, <span class="st">"gradient boosting"</span>, <span class="st">"xgboost"</span>, <span class="st">"lightgbm"</span>, <span class="st">"catboost"</span>, <span class="st">"k-means clustering"</span>, <span class="st">"hierarchical clustering"</span>, <span class="st">"dbscan"</span>, <span class="st">"apriori"</span>, <span class="st">"frequent pattern mining"</span>, <span class="st">"association rule learning"</span>, <span class="st">"collaborative filtering"</span>, <span class="st">"content-based filtering"</span>, <span class="st">"matrix factorization"</span>, <span class="st">"recommender systems"</span>, <span class="st">"anomaly detection"</span>, <span class="st">"time series forecasting"</span>, <span class="st">"sequence prediction"</span>, <span class="st">"image recognition"</span>, <span class="st">"object detection"</span>, <span class="st">"semantic segmentation"</span>, <span class="st">"instance segmentation"</span>, <span class="st">"image classification"</span>, <span class="st">"image generation"</span>, <span class="st">"image synthesis"</span>, <span class="st">"image super-resolution"</span>, <span class="st">"image denoising"</span>, <span class="st">"image inpainting"</span>, <span class="st">"image captioning"</span>, <span class="st">"image style transfer"</span>, <span class="st">"image translation"</span>, <span class="st">"image segmentation"</span>, <span class="st">"image registration"</span>, <span class="st">"image restoration"</span>, <span class="st">"image enhancement"</span>, <span class="st">"image compression"</span>, <span class="st">"image processing"</span>, <span class="st">"image analysis"</span>, <span class="st">"image understanding"</span>, <span class="st">"image interpretation"</span>)</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a list of data visualization skills</span></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>data_visualization <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"data visualization"</span>, <span class="st">"data analysis"</span>, <span class="st">"data exploration"</span>, <span class="st">"data interpretation"</span>, <span class="st">"data presentation"</span>, <span class="st">"data storytelling"</span>, <span class="st">"data reporting"</span>, <span class="st">"data communication"</span>, <span class="st">"data visualization tools"</span>, <span class="st">"data visualization techniques"</span>, <span class="st">"data visualization best practices"</span>, <span class="st">"data visualization libraries"</span>, <span class="st">"data visualization frameworks"</span>, <span class="st">"data visualization software"</span>, <span class="st">"data visualization platforms"</span>, <span class="st">"data visualization dashboards"</span>, <span class="st">"data visualization charts"</span>, <span class="st">"data visualization graphs"</span>, <span class="st">"data visualization maps"</span>, <span class="st">"data visualization tables"</span>, <span class="st">"data visualization infographics"</span>, <span class="st">"data visualization reports"</span>, <span class="st">"data visualization insights"</span>, <span class="st">"data visualization trends"</span>, <span class="st">"data visualization patterns"</span>, <span class="st">"data visualization principles"</span>, <span class="st">"data visualization guidelines"</span>, <span class="st">"data visualization standards"</span>, <span class="st">"data visualization design"</span>, <span class="st">"data visualization aesthetics"</span>, <span class="st">"data visualization color theory"</span>, <span class="st">"data visualization typography"</span>, <span class="st">"data visualization layout"</span>, <span class="st">"data visualization composition"</span>, <span class="st">"data visualization hierarchy"</span>, <span class="st">"data visualization alignment"</span>, <span class="st">"data visualization contrast"</span>, <span class="st">"data visualization proximity"</span>, <span class="st">"data visualization repetition"</span>, <span class="st">"data visualization scale"</span>, <span class="st">"data visualization size"</span>, <span class="st">"data visualization shape"</span>, <span class="st">"data visualization texture"</span>, <span class="st">"data visualization value"</span>, <span class="st">"data visualization color"</span>, <span class="st">"data visualization form"</span>, <span class="st">"data visualization space"</span>, <span class="st">"data visualization motion"</span>, <span class="st">"data visualization pattern"</span>, <span class="st">"data visualization rhythm"</span>, <span class="st">"data visualization unity"</span>, <span class="st">"data visualization balance"</span>, <span class="st">"data visualization emphasis"</span>, <span class="st">"data visualization variety"</span>, <span class="st">"data visualization harmony"</span>, <span class="st">"data visualization contrast"</span>, <span class="st">"data visualization proportion"</span>, <span class="st">"data visualization movement"</span>, <span class="st">"data visualization direction"</span>, <span class="st">"data visualization emphasis"</span>, <span class="st">"data visualization variety"</span>, <span class="st">"data visualization harmony"</span>, <span class="st">"data visualization contrast"</span>, <span class="st">"data visualization proportion"</span>, <span class="st">"data visualization movement"</span>, <span class="st">"data visualization direction"</span>, <span class="st">"data visualization emphasis"</span>, <span class="st">"data visualization variety"</span>, <span class="st">"data visualization harmony"</span>, <span class="st">"data visualization contrast"</span>, <span class="st">"data visualization proportion"</span>, <span class="st">"data visualization movement"</span>, <span class="st">"data visualization direction"</span>, <span class="st">"data visualization emphasis"</span>, <span class="st">"data visualization variety"</span>, <span class="st">"data visualization harmony"</span>, <span class="st">"data visualization contrast"</span>, <span class="st">"data visualization proportion"</span>, <span class="st">"data visualization movement"</span>, <span class="st">"data visualization direction"</span>, <span class="st">"data visualization emphasis"</span>, <span class="st">"data visualization variety"</span>, <span class="st">"data visualization harmony"</span>, <span class="st">"data visualization contrast"</span>, <span class="st">"data visualization proportion"</span>, <span class="st">"data visualization movement"</span>, <span class="st">"data visualization direction"</span>, <span class="st">"data visualization emphasis"</span>, <span class="st">"data visualization variety"</span>, <span class="st">"data visualization harmony"</span>, <span class="st">"data visualization contrast"</span>, <span class="st">"data visualization proportion"</span>, <span class="st">"data visualization movement"</span>, <span class="st">"data visualization direction"</span>, <span class="st">"data visualization emphasis"</span>, <span class="st">"data visualization variety"</span>, <span class="st">"data visualization harmony"</span>, <span class="st">"data visualization contrast"</span>, <span class="st">"data visualization proportion"</span>, <span class="st">"data visualization"</span>)</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Classify the skills into categories</span></span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>combined_data <span class="ot">&lt;-</span> combined_data <span class="sc">%&gt;%</span></span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">programming_language =</span> <span class="fu">str_extract</span>(<span class="fu">tolower</span>(job_summary), <span class="fu">paste</span>(programming_languages, <span class="at">collapse =</span> <span class="st">"|"</span>)),</span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">machine_learning =</span> <span class="fu">str_extract</span>(<span class="fu">tolower</span>(job_summary), <span class="fu">paste</span>(machine_learning, <span class="at">collapse =</span> <span class="st">"|"</span>)),</span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">data_visualization =</span> <span class="fu">str_extract</span>(<span class="fu">tolower</span>(job_summary), <span class="fu">paste</span>(data_visualization, <span class="at">collapse =</span> <span class="st">"|"</span>)))</span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Check the updated dataframe with skill categories</span></span>
+<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a><span class="co"># head(combined_data)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="data-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="data-analysis">Data Analysis</h2>
+<p>The skills were analyzed to determine the most in-demand skills in the data science field. The following steps were taken to analyze the skills:</p>
+<ol type="1">
+<li><strong>Count Skills by Category</strong>: The skills were counted by category to determine the most in-demand skills in each category.</li>
+<li><strong>Visualize Skills</strong>: The results were visualized using bar charts and word clouds to highlight the key skills in demand.</li>
+</ol>
+<p>The analysis was conducted to identify the key skills in demand in the data science field.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Count the number of job postings by skill category</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>skill_counts <span class="ot">&lt;-</span> combined_data <span class="sc">%&gt;%</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(job_id, programming_language, machine_learning, data_visualization) <span class="sc">%&gt;%</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="sc">-</span>job_id, <span class="at">names_to =</span> <span class="st">"skill_category"</span>, <span class="at">values_to =</span> <span class="st">"skill"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(skill)) <span class="sc">%&gt;%</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(skill_category, skill) <span class="sc">%&gt;%</span></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">count =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(count))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`summarise()` has grouped output by 'skill_category'. You can override using
+the `.groups` argument.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check the skill counts</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="co"># head(skill_counts)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="visualization" class="level2">
+<h2 class="anchored" data-anchor-id="visualization">Visualization</h2>
+<p>The results were visualized using bar charts and word clouds to highlight the key skills in demand. The following visualizations were created to showcase the key skills in the data science field:</p>
+<ol type="1">
+<li><strong>Bar Chart</strong>: A bar chart was created to show the skills in demand by category.</li>
+<li><strong>Word Cloud</strong>: A word cloud was created to visualize the most in-demand skills in the data science field.</li>
+</ol>
+<p>The visualizations provide insights into the key skills required for data science positions.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a bar chart of the skills in demand by category</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>skill_counts <span class="sc">%&gt;%</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(skill, count), <span class="at">y =</span> count, <span class="at">fill =</span> skill_category)) <span class="sc">+</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Skills in Demand by Category"</span>,</span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Skill"</span>,</span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Count"</span>,</span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Skill Category"</span>) <span class="sc">+</span></span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="project3_files/figure-html/visualization-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Split job skills, count occurrences, and visualize</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>skills_series <span class="ot">&lt;-</span> combined_data <span class="sc">%&gt;%</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(job_skills)) <span class="sc">%&gt;%</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">job_skills =</span> <span class="fu">strsplit</span>(<span class="fu">as.character</span>(job_skills), <span class="st">","</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(job_skills) <span class="sc">%&gt;%</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">job_skills =</span> <span class="fu">trimws</span>(job_skills)) </span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>skill_counts <span class="ot">&lt;-</span> skills_series <span class="sc">%&gt;%</span></span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(job_skills, <span class="at">sort =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot top skills</span></span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>top_skills <span class="ot">&lt;-</span> <span class="fu">head</span>(skill_counts, <span class="dv">20</span>)</span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(top_skills, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(job_skills, n), <span class="at">y =</span> n)) <span class="sc">+</span></span>
+<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">fill =</span> <span class="st">"steelblue"</span>) <span class="sc">+</span></span>
+<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Top 20 Data Science Skills"</span>, <span class="at">x =</span> <span class="st">"Skills"</span>, <span class="at">y =</span> <span class="st">"Frequency"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="project3_files/figure-html/visualization-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a word cloud of the most in-demand skills</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>word_freq_df <span class="sc">%&gt;%</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(word <span class="sc">%in%</span> <span class="fu">c</span>(programming_languages, machine_learning, data_visualization)) <span class="sc">%&gt;%</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">label =</span> word, <span class="at">size =</span> freq, <span class="at">color =</span> word)) <span class="sc">+</span></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text_wordcloud</span>() <span class="sc">+</span></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_size_area</span>(<span class="at">max_size =</span> <span class="dv">20</span>) <span class="sc">+</span></span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="project3_files/figure-html/visualization-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<p>The analysis of job postings for data science positions revealed the key skills in demand in the data science field. The most in-demand skills were found to be programming languages, machine learning, and data visualization. Programming languages such as Python, R, and Java were highly valued, along with machine learning skills such as deep learning, neural networks, and artificial intelligence. Data visualization skills were also considered essential, with data visualization, data analysis, and data exploration being among the most in-demand skills.</p>
+<p>The results of the analysis provide valuable insights for professionals and organizations looking to stay competitive in the data science field. By focusing on developing skills in programming languages, machine learning, and data visualization, professionals can enhance their career prospects and contribute to the success of their organizations. Organizations can also use the insights to recruit talent with the right skills and capabilities to drive innovation and growth.</p>
+<p>The exponential growth of the data science field presents numerous opportunities for professionals and organizations to leverage data-driven insights for decision-making and strategic planning. By understanding the key skills in demand and staying abreast of industry trends, professionals and organizations can position themselves for success in the dynamic and evolving data science landscape.</p>
+<p>The project provides a comprehensive analysis of the skills required for data science positions and offers valuable insights for professionals and organizations seeking to excel in the data science field. By focusing on developing the most in-demand skills and staying informed about industry trends, professionals and organizations can navigate the rapidly changing data science landscape and achieve their goals in this exciting and rewarding field.</p>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<ol type="1">
+<li>Kaggle. (n.d.). Data Science Skills. Retrieved from <a href="https://www.kaggle.com/andrewmvd/data-science-skills">https://www.kaggle.com/andrewmvd/data-science-skills</a></li>
+<li>Indeed. (n.d.). Job Search. Retrieved from <a href="https://www.indeed.com/">https://www.indeed.com/</a></li>
+<li>R Core Team. (2021). R: A language and environment for statistical computing. R Foundation for Statistical Computing, Vienna, Austria. Retrieved from <a href="https://www.R-project.org/">https://www.R-project.org/</a></li>
+<li>Wickham, H., Averick, M., Bryan, J., Chang, W., McGowan, L. D., François, R., … &amp; Yutani, H. (2019). Welcome to the tidyverse. Journal of Open Source Software, 4(43), 1686. Retrieved from <a href="https://doi.org/10.21105/joss.01686">https://doi.org/10.21105/joss.01686</a></li>
+<li>Silge, J., &amp; Robinson, D. (2017). Text mining with R: A tidy approach. O’Reilly Media, Inc.&nbsp;Retrieved from <a href="https://www.tidytextmining.com/">https://www.tidytextmining.com/</a></li>
+<li>Feinerer, I., Hornik, K., &amp; Meyer, D. (2008). Text mining infrastructure in R. Journal of Statistical Software, 25(5), 1-54. Retrieved from <a href="https://www.jstatsoft.org/v25/i05/">https://www.jstatsoft.org/v25/i05/</a></li>
+<li>Wickham, H., &amp; Grolemund, G. (2016). R for data science: Import, tidy, transform, visualize, and model data. O’Reilly Media, Inc.&nbsp;Retrieved from <a href="https://r4ds.had.co.nz/">https://r4ds.had.co.nz/</a></li>
+<li>Kuhn, M., &amp; Johnson, K. (2013). Applied predictive modeling. Springer Science &amp; Business Media. Retrieved from <a href="https://link.springer.com/book/10.1007/978-1-4614-6849-3">https://link.springer.com/book/10.1007/978-1-4614-6849-3</a></li>
+<li>Wickham, H. (2016). ggplot2: Elegant graphics for data analysis. Springer. Retrieved from <a href="https://ggplot2.tidyverse.org/">https://ggplot2.tidyverse.org/</a></li>
+</ol>
 </section>
 
 </main>
