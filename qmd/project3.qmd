@@ -105,14 +105,13 @@ The data was structured into threee tables for analysis:
 
 The image representation of the data is shown here:
 
-![Proposed Database Table Structures](https://raw.githubusercontent.com/spacerome/DATA607_Project3_FALL2024/main/additional_materials/Figure1.png)
-### Sources
+![Proposed Database Table Structures](https://raw.githubusercontent.com/spacerome/DATA607_Project3_FALL2024/main/additional_materials/Figure1.png) \### Sources
 
 The links to the data sources are from here:
 
-- [Kaggle Job Postings](https://www.kaggle.com/datasets/asaniczka/data-science-job-postings-and-skills)
-- [Kaggle Data Science Skills](https://www.kaggle.com/datasets/aravindanr22052001/skillscsv)
-- [Job Postings](https://github.com/Minh-Nguyen-0401/Glassdoor-Data-Preprocessing-And-EDA-Project)
+-   [Kaggle Job Postings](https://www.kaggle.com/datasets/asaniczka/data-science-job-postings-and-skills)
+-   [Kaggle Data Science Skills](https://www.kaggle.com/datasets/aravindanr22052001/skillscsv)
+-   [Job Postings](https://github.com/Minh-Nguyen-0401/Glassdoor-Data-Preprocessing-And-EDA-Project)
 
 ## Data Cleaning
 
@@ -366,6 +365,36 @@ top_skills %>%
 ```
 
 Below is the word cloud of the most in-demand skills in data science, where the size of each word shows how often a particular skill occurs in job postings. Python, SQL, and Data Analysis will be the three most outstanding skills, therefore meaning these are the most in-demand skills in the field. Other relevant technical skills are Java, AWS, Tableau, and Machine Learning, showing interest in being proficient with programming languages, cloud computing platforms, and data visualization tools. Also, some soft skills are represented, like Communication, Leadership, and Teamwork, which means that a data science professional is not only required to deliver on technical tasks but also on collaboration and effective communication of insights.
+
+```{r data_summary}
+# Filter the top 20 skills
+top_20_skills <- skill_counts %>%
+  arrange(desc(n)) %>%
+  head(20)
+
+# Calculate the total count of just the top 20 skills
+total_top_20_count <- sum(top_20_skills$n)
+
+# Calculate percentages for the top 20 skills based on the total top 20 count
+top_20_skills <- top_20_skills %>%
+  mutate(percentage = (n / total_top_20_count) * 100)
+
+# Display the table
+top_20_skills_table <- top_20_skills %>%
+  select(job_skills, n, percentage) %>%
+  rename(Skill = job_skills, Frequency = n, Percentage = percentage)
+
+# Format the percentage to two decimal places
+top_20_skills_table$Percentage <- round(top_20_skills_table$Percentage, 2)
+
+# Display the table using kable for a neat format
+
+kable(top_20_skills_table, caption = "Top 20 Data Science Skills with Percentages")
+
+```
+
+Analyzing the top 20 data science skills, one may observe that Python with 12.67%, SQL with 12.16%, and Data Analysis at 11.53% of the total number of mentions is the most in-demand skill from job postings, reflecting nearly 40%. Therefore, such a ranking signifies that both programming and analytical capabilities are needed critically in the job cadre of data science. Other highly rated skills include communication skills, at 6.59%, indicating that what is needed is a professional able to communicate complex insights effectively. Of note are also Machine Learning at 5.19% and cloud platforms such as AWS at 4.59%, further indicating the requirement in skill sets for intelligent system development and cloud infrastructure management. Other essential tools in data visualization include Tableau at 4.45% and Data Visualization techniques at 4.12%, necessary to communicate data-driven insights among stakeholders. On the whole, from the above data, it shows a data science professional is bound to possess the right blend of technical, analytics, and communication skills.
+
 
 ## Conclusion
 
