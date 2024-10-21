@@ -345,18 +345,6 @@ The exponential growth of the data science field presents numerous opportunities
 
 The project provides a comprehensive analysis of the skills required for data science positions and offers valuable insights for professionals and organizations seeking to excel in the data science field. By focusing on developing the most in-demand skills and staying informed about industry trends, professionals and organizations can navigate the rapidly changing data science landscape and achieve their goals in this exciting and rewarding field.
 
-## References
-
-1.  Kaggle. (n.d.). Data Science Skills. Retrieved from [https://www.kaggle.com/andrewmvd/data-science-skills](https://www.kaggle.com/andrewmvd/data-science-skills)
-2.  Indeed. (n.d.). Job Search. Retrieved from [https://www.indeed.com/](https://www.indeed.com/)
-3.  R Core Team. (2021). R: A language and environment for statistical computing. R Foundation for Statistical Computing, Vienna, Austria. Retrieved from [https://www.R-project.org/](https://www.R-project.org/)
-4.  Wickham, H., Averick, M., Bryan, J., Chang, W., McGowan, L. D., François, R., ... & Yutani, H. (2019). Welcome to the tidyverse. Journal of Open Source Software, 4(43), 1686. Retrieved from [https://doi.org/10.21105/joss.01686](https://doi.org/10.21105/joss.01686)
-5.  Silge, J., & Robinson, D. (2017). Text mining with R: A tidy approach. O'Reilly Media, Inc. Retrieved from [https://www.tidytextmining.com/](https://www.tidytextmining.com/)
-6.  Feinerer, I., Hornik, K., & Meyer, D. (2008). Text mining infrastructure in R. Journal of Statistical Software, 25(5), 1-54. Retrieved from [https://www.jstatsoft.org/v25/i05/](https://www.jstatsoft.org/v25/i05/)
-7.  Wickham, H., & Grolemund, G. (2016). R for data science: Import, tidy, transform, visualize, and model data. O'Reilly Media, Inc. Retrieved from [https://r4ds.had.co.nz/](https://r4ds.had.co.nz/)
-8.  Kuhn, M., & Johnson, K. (2013). Applied predictive modeling. Springer Science & Business Media. Retrieved from [https://link.springer.com/book/10.1007/978-1-4614-6849-3](https://link.springer.com/book/10.1007/978-1-4614-6849-3)
-9.  Wickham, H. (2016). ggplot2: Elegant graphics for data analysis. Springer. Retrieved from [https://ggplot2.tidyverse.org/](https://ggplot2.tidyverse.org/)
-
 
 
 
