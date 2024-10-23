@@ -105,7 +105,9 @@ The data was structured into threee tables for analysis:
 
 The image representation of the data is shown here:
 
-![Proposed Database Table Structures](https://raw.githubusercontent.com/spacerome/DATA607_Project3_FALL2024/main/additional_materials/Figure1.png) \### Sources
+![Proposed Database Table Structures](https://raw.githubusercontent.com/spacerome/DATA607_Project3_FALL2024/main/additional_materials/Figure1.png) 
+
+### Sources
 
 The links to the data sources are from here:
 
